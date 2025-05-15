@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="vietnam_attendance_rule_view_form" model="ir.ui.view">
+        <field name="name">vietnam.attendance.rule.view.form</field>
+        <field name="model">vietnam.attendance.rule</field>
+        <field name="arch" type="xml">
+            <form string="Quy định chấm công">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Tên quy định..."/>
+                        </h1>
+                        <div>
+                            <field name="code" placeholder="Mã quy định..."/>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="rule_type"/>
+                            <field name="sequence"/>
+                            <field name="time_limit" attrs="{'invisible': [('rule_type', 'not in', ['late', 'early_leave'])]}"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="deduction_type" attrs="{'invisible': [('rule_type', 'in', ['overtime', 'holiday', 'weekend', 'night_shift'])]}"/>
+                            <field name="deduction_value" attrs="{'invisible': [('rule_type', 'in', ['overtime', 'holiday', 'weekend', 'night_shift'])], 'required': [('deduction_type', 'in', ['fixed', 'percentage'])]}"/>
+                            <field name="bonus_type" attrs="{'invisible': [('rule_type', 'not in', ['overtime', 'holiday', 'weekend', 'night_shift'])]}"/>
+                            <field name="bonus_value" attrs="{'invisible': [('rule_type', 'not in', ['overtime', 'holiday', 'weekend', 'night_shift'])], 'required': [('bonus_type', 'in', ['fixed', 'percentage'])]}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Công thức" attrs="{'invisible': ['&amp;', ('deduction_type', '!=', 'formula'), ('bonus_type', '!=', 'formula')]}">
+                            <group>
+                                <field name="deduction_formula" attrs="{'invisible': ['|', ('deduction_type', '!=', 'formula'), ('rule_type', 'in', ['overtime', 'holiday', 'weekend', 'night_shift'])], 'required': [('deduction_type', '=', 'formula')]}"/>
+                                <field name="bonus_formula" attrs="{'invisible': ['|', ('bonus_type', '!=', 'formula'), ('rule_type', 'not in', ['overtime', 'holiday', 'weekend', 'night_shift'])], 'required': [('bonus_type', '=', 'formula')]}"/>
+                            </group>
+                            <div class="alert alert-info" role="alert" attrs="{'invisible': [('deduction_type', '!=', 'formula')]}">
+                                <p><strong>Biến công thức khấu trừ:</strong></p>
+                                <ul>
+                                    <li><code>time_late</code>: Thời gian đi muộn (phút)</li>
+                                    <li><code>time_early_leave</code>: Thời gian về sớm (phút)</li>
+                                    <li><code>absence_days</code>: Số ngày vắng mặt</li>
+                                    <li><code>overtime_hours</code>: Số giờ tăng ca</li>
+                                </ul>
+                                <p><strong>Ví dụ:</strong> <code>time_late * 5000</code> - Phạt 5.000 VND/phút đi muộn</p>
+                            </div>
+                            <div class="alert alert-info" role="alert" attrs="{'invisible': [('bonus_type', '!=', 'formula')]}">
+                                <p><strong>Biến công thức thưởng:</strong></p>
+                                <ul>
+                                    <li><code>overtime_hours</code>: Số giờ tăng ca</li>
+                                    <li><code>holiday_hours</code>: Số giờ tăng ca ngày lễ</li>
+                                    <li><code>weekend_hours</code>: Số giờ tăng ca cuối tuần</li>
+                                    <li><code>night_shift_hours</code>: Số giờ tăng ca ca đêm</li>
+                                </ul>
+                                <p><strong>Ví dụ:</strong> <code>overtime_hours * 1.5 * base_salary / 22 / 8</code> - Tăng ca 150% lương cơ bản</p>
+                            </div>
+                        </page>
+                        <page string="Đối tượng áp dụng">
+                            <group>
+                                <field name="applicable_to_ids" widget="many2many_tags"/>
+                                <field name="department_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Mô tả">
+                            <field name="description" placeholder="Mô tả chi tiết về quy định..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="vietnam_attendance_rule_view_tree" model="ir.ui.view">
+        <field name="name">vietnam.attendance.rule.view.list</field>
+        <field name="model">vietnam.attendance.rule</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list string="Quy định chấm công">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="rule_type"/>
+                <field name="time_limit" attrs="{'invisible': [('rule_type', 'not in', ['late', 'early_leave'])]}"/>
+                <field name="deduction_type" attrs="{'invisible': [('rule_type', 'in', ['overtime', 'holiday', 'weekend', 'night_shift'])]}"/>
+                <field name="deduction_value" attrs="{'invisible': [('rule_type', 'in', ['overtime', 'holiday', 'weekend', 'night_shift'])]}"/>
+                <field name="bonus_type" attrs="{'invisible': [('rule_type', 'not in', ['overtime', 'holiday', 'weekend', 'night_shift'])]}"/>
+                <field name="bonus_value" attrs="{'invisible': [('rule_type', 'not in', ['overtime', 'holiday', 'weekend', 'night_shift'])]}"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="vietnam_attendance_rule_view_search" model="ir.ui.view">
+        <field name="name">vietnam.attendance.rule.view.search</field>
+        <field name="model">vietnam.attendance.rule</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm quy định chấm công">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Đi muộn" name="late" domain="[('rule_type', '=', 'late')]"/>
+                <filter string="Về sớm" name="early_leave" domain="[('rule_type', '=', 'early_leave')]"/>
+                <filter string="Vắng mặt" name="absence" domain="[('rule_type', '=', 'absence')]"/>
+                <filter string="Tăng ca" name="overtime" domain="[('rule_type', '=', 'overtime')]"/>
+                <filter string="Ngày lễ" name="holiday" domain="[('rule_type', '=', 'holiday')]"/>
+                <filter string="Cuối tuần" name="weekend" domain="[('rule_type', '=', 'weekend')]"/>
+                <filter string="Ca đêm" name="night_shift" domain="[('rule_type', '=', 'night_shift')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Loại quy định" name="group_rule_type" domain="[]" context="{'group_by': 'rule_type'}"/>
+                    <filter string="Công ty" name="group_company" domain="[]" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="vietnam_attendance_rule_action" model="ir.actions.act_window">
+        <field name="name">Quy định chấm công</field>
+        <field name="res_model">vietnam.attendance.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="vietnam_attendance_rule_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo quy định chấm công đầu tiên
+            </p>
+            <p>
+                Bạn có thể tạo các quy định chấm công để áp dụng cho nhân viên.
+                Ví dụ: quy định về đi muộn, về sớm, tăng ca, v.v.
+            </p>
+        </field>
+    </record>
+</odoo>
