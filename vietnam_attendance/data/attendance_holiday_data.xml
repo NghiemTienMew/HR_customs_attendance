@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Ngày nghỉ lễ chính thức của Việt Nam -->
+        
+        <!-- Tết Dương lịch -->
+        <record id="holiday_new_year" model="vietnam.attendance.holiday">
+            <field name="name">Tết Dương lịch</field>
+            <field name="date">2025-01-01</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">True</field>
+            <field name="description">Nghỉ lễ Tết Dương lịch</field>
+        </record>
+        
+        <!-- Tết Nguyên đán -->
+        <record id="holiday_tet_1" model="vietnam.attendance.holiday">
+            <field name="name">Tết Nguyên đán (ngày 1)</field>
+            <field name="date">2025-01-29</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">False</field>
+            <field name="description">Nghỉ lễ Tết Nguyên đán</field>
+        </record>
+        
+        <record id="holiday_tet_2" model="vietnam.attendance.holiday">
+            <field name="name">Tết Nguyên đán (ngày 2)</field>
+            <field name="date">2025-01-30</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">False</field>
+            <field name="description">Nghỉ lễ Tết Nguyên đán</field>
+        </record>
+        
+        <record id="holiday_tet_3" model="vietnam.attendance.holiday">
+            <field name="name">Tết Nguyên đán (ngày 3)</field>
+            <field name="date">2025-01-31</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">False</field>
+            <field name="description">Nghỉ lễ Tết Nguyên đán</field>
+        </record>
+        
+        <record id="holiday_tet_4" model="vietnam.attendance.holiday">
+            <field name="name">Tết Nguyên đán (ngày 4)</field>
+            <field name="date">2025-02-01</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">False</field>
+            <field name="description">Nghỉ lễ Tết Nguyên đán</field>
+        </record>
+        
+        <record id="holiday_tet_5" model="vietnam.attendance.holiday">
+            <field name="name">Tết Nguyên đán (ngày 5)</field>
+            <field name="date">2025-02-02</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">False</field>
+            <field name="description">Nghỉ lễ Tết Nguyên đán</field>
+        </record>
+        
+        <!-- Giỗ tổ Hùng Vương -->
+        <record id="holiday_hung_kings" model="vietnam.attendance.holiday">
+            <field name="name">Giỗ tổ Hùng Vương</field>
+            <field name="date">2025-04-06</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">False</field>
+            <field name="description">Nghỉ lễ Giỗ tổ Hùng Vương (10/3 Âm lịch)</field>
+        </record>
+        
+        <!-- Ngày thống nhất đất nước -->
+        <record id="holiday_liberation_day" model="vietnam.attendance.holiday">
+            <field name="name">Ngày Thống nhất đất nước</field>
+            <field name="date">2025-04-30</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">True</field>
+            <field name="description">Nghỉ lễ 30/4</field>
+        </record>
+        
+        <!-- Ngày Quốc tế Lao động -->
+        <record id="holiday_labour_day" model="vietnam.attendance.holiday">
+            <field name="name">Ngày Quốc tế Lao động</field>
+            <field name="date">2025-05-01</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">True</field>
+            <field name="description">Nghỉ lễ 1/5</field>
+        </record>
+        
+        <!-- Quốc khánh -->
+        <record id="holiday_national_day" model="vietnam.attendance.holiday">
+            <field name="name">Quốc khánh</field>
+            <field name="date">2025-09-02</field>
+            <field name="type">public</field>
+            <field name="is_paid">True</field>
+            <field name="repeat_annually">True</field>
+            <field name="description">Nghỉ lễ Quốc khánh 2/9</field>
+        </record>
+        
+        <!-- Cài đặt hàm tạo ngày nghỉ lễ -->
+        <function model="vietnam.attendance.holiday" name="create_public_holidays_for_vietnam">
+            <value eval="2025"/>
+        </function>
+    </data>
+</odoo>
