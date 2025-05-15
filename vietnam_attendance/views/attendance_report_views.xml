@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="vietnam_attendance_report_view_tree" model="ir.ui.view">
+        <field name="name">vietnam.attendance.report.view.list</field>
+        <field name="model">vietnam.attendance.report</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list string="Báo cáo chấm công" create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="date"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="worked_hours" widget="float_time" sum="Tổng giờ làm việc"/>
+                <field name="is_late"/>
+                <field name="is_early_leave"/>
+                <field name="attendance_type"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="vietnam_attendance_report_view_pivot" model="ir.ui.view">
+        <field name="name">vietnam.attendance.report.view.pivot</field>
+        <field name="model">vietnam.attendance.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Phân tích chấm công" display_quantity="true">
+                <field name="employee_id" type="row"/>
+                <field name="date" type="col"/>
+                <field name="worked_hours" type="measure" widget="float_time"/>
+                <field name="is_late" type="measure"/>
+                <field name="is_early_leave" type="measure"/>
+                <field name="late_minutes" type="measure" widget="float_time"/>
+                <field name="early_leave_minutes" type="measure" widget="float_time"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="vietnam_attendance_report_view_graph" model="ir.ui.view">
+        <field name="name">vietnam.attendance.report.view.graph</field>
+        <field name="model">vietnam.attendance.report</field>
+        <field name="arch" type="xml">
+            <graph string="Biểu đồ chấm công">
+                <field name="employee_id"/>
+                <field name="date:month"/>
+                <field name="worked_hours" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="vietnam_attendance_report_view_search" model="ir.ui.view">
+        <field name="name">vietnam.attendance.report.view.search</field>
+        <field name="model">vietnam.attendance.report</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm báo cáo chấm công">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="date"/>
+                <filter string="Ngày hôm nay" name="today" domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Tuần này" name="week" domain="[('date', '&gt;=', (context_today() + relativedelta(weeks=-1,days=1,weekday=0)).strftime('%Y-%m-%d')), ('date', '&lt;=', (context_today() + relativedelta(weekday=6)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Tháng này" name="month" domain="[('date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')), ('date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="Đi muộn" name="late" domain="[('is_late', '=', True)]"/>
+                <filter string="Về sớm" name="early_leave" domain="[('is_early_leave', '=', True)]"/>
+                <filter string="Tăng ca" name="overtime" domain="[('attendance_type', '=', 'overtime')]"/>
+                <filter string="Làm từ xa" name="remote" domain="[('attendance_type', '=', 'remote')]"/>
+                <filter string="Cuối tuần" name="weekend" domain="[('is_weekend', '=', True)]"/>
+                <filter string="Ngày lễ" name="holiday" domain="[('is_holiday', '=', True)]"/>
+                <separator/>
+                <filter string="Nháp" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Đã xác nhận" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Đã duyệt" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Từ chối" name="rejected" domain="[('state', '=', 'rejected')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Nhân viên" name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Phòng ban" name="department" domain="[]" context="{'group_by': 'department_id'}"/>
+                    <filter string="Ca làm việc" name="shift" domain="[]" context="{'group_by': 'shift_id'}"/>
+                    <filter string="Ngày" name="day" domain="[]" context="{'group_by': 'date:day'}"/>
+                    <filter string="Tuần" name="week" domain="[]" context="{'group_by': 'date:week'}"/>
+                    <filter string="Tháng" name="month" domain="[]" context="{'group_by': 'date:month'}"/>
+                    <filter string="Năm" name="year" domain="[]" context="{'group_by': 'date:year'}"/>
+                    <filter string="Trạng thái" name="state" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="vietnam_attendance_report_view_calendar" model="ir.ui.view">
+        <field name="name">vietnam.attendance.report.view.calendar</field>
+        <field name="model">vietnam.attendance.report</field>
+        <field name="arch" type="xml">
+            <calendar string="Lịch chấm công" date_start="check_in" date_stop="check_out" mode="month" color="employee_id" quick_add="False" event_open_popup="True">
+                <field name="employee_id"/>
+                <field name="shift_id"/>
+                <field name="worked_hours" widget="float_time"/>
+                <field name="is_late"/>
+                <field name="is_early_leave"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="vietnam_attendance_report_action" model="ir.actions.act_window">
+        <field name="name">Báo cáo chấm công</field>
+        <field name="res_model">vietnam.attendance.report</field>
+        <field name="view_mode">pivot,graph,list,calendar</field>
+        <field name="search_view_id" ref="vietnam_attendance_report_view_search"/>
+        <field name="context">{'search_default_month': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Không có dữ liệu báo cáo chấm công
+            </p>
+            <p>
+                Hãy tạo dữ liệu chấm công để xem báo cáo.
+            </p>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="vietnam_attendance_report_dashboard_action" model="ir.actions.act_window">
+        <field name="name">Bảng điều khiển chấm công</field>
+        <field name="res_model">vietnam.attendance.report</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="search_view_id" ref="vietnam_attendance_report_view_search"/>
+        <field name="domain">[('date', '&gt;=', (context_today() + relativedelta(months=-1, day=1)).strftime(&quot;%Y-%m-%d&quot;)), ('date', '&lt;=', (context_today() + relativedelta(day=31)).strftime(&quot;%Y-%m-%d&quot;))]</field>
+        <field name="context">{'search_default_month': 1, 'group_by': ['employee_id', 'date:day']}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Không có dữ liệu báo cáo chấm công
+            </p>
+            <p>
+                Hãy tạo dữ liệu chấm công để xem báo cáo.
+            </p>
+        </field>
+    </record>
+
+    <!-- My Attendance Report Action -->
+    <record id="vietnam_attendance_my_report_action" model="ir.actions.act_window">
+        <field name="name">Báo cáo chấm công của tôi</field>
+        <field name="res_model">vietnam.attendance.report</field>
+        <field name="view_mode">pivot,graph,list,calendar</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="search_view_id" ref="vietnam_attendance_report_view_search"/>
+        <field name="context">{'search_default_month': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Không có dữ liệu báo cáo chấm công
+            </p>
+            <p>
+                Hãy tạo dữ liệu chấm công để xem báo cáo.
+            </p>
+        </field>
+    </record>
+</odoo>

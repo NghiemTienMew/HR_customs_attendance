@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="vietnam_attendance_holiday_view_form" model="ir.ui.view">
+        <field name="name">vietnam.attendance.holiday.view.form</field>
+        <field name="model">vietnam.attendance.holiday</field>
+        <field name="arch" type="xml">
+            <form string="Ngày nghỉ lễ">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Tên ngày lễ..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="type"/>
+                            <field name="is_paid"/>
+                            <field name="repeat_annually"/>
+                            <field name="day_of_week" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="country_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="compensate_date" invisible="day_of_week not in ['6', '7']"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Mô tả">
+                            <field name="description" placeholder="Mô tả về ngày lễ..."/>
+                        </page>
+                        <page string="Phòng ban áp dụng">
+                            <field name="department_ids" widget="many2many_tags"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="vietnam_attendance_holiday_view_tree" model="ir.ui.view">
+        <field name="name">vietnam.attendance.holiday.view.list</field>
+        <field name="model">vietnam.attendance.holiday</field>
+        <field name="arch" type="xml">
+            <list string="Ngày nghỉ lễ" decoration-danger="type == 'public'" decoration-warning="type == 'company'" decoration-info="type == 'other'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="type"/>
+                <field name="day_of_week"/>
+                <field name="is_paid"/>
+                <field name="repeat_annually"/>
+                <field name="country_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="vietnam_attendance_holiday_view_calendar" model="ir.ui.view">
+        <field name="name">vietnam.attendance.holiday.view.calendar</field>
+        <field name="model">vietnam.attendance.holiday</field>
+        <field name="arch" type="xml">
+            <calendar string="Lịch ngày nghỉ lễ" date_start="date" color="type" mode="month" quick_create="False">
+                <field name="name"/>
+                <field name="type"/>
+                <field name="is_paid"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="vietnam_attendance_holiday_view_search" model="ir.ui.view">
+        <field name="name">vietnam.attendance.holiday.view.search</field>
+        <field name="model">vietnam.attendance.holiday</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm ngày nghỉ lễ">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="type"/>
+                <filter string="Lễ chính thức" name="public" domain="[('type', '=', 'public')]"/>
+                <filter string="Lễ công ty" name="company" domain="[('type', '=', 'company')]"/>
+                <filter string="Khác" name="other" domain="[('type', '=', 'other')]"/>
+                <separator/>
+                <filter string="Được thanh toán" name="paid" domain="[('is_paid', '=', True)]"/>
+                <filter string="Không được thanh toán" name="unpaid" domain="[('is_paid', '=', False)]"/>
+                <separator/>
+                <filter string="Lặp lại hàng năm" name="repeat" domain="[('repeat_annually', '=', True)]"/>
+                <filter string="Không lặp lại" name="no_repeat" domain="[('repeat_annually', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Loại ngày lễ" name="group_type" domain="[]" context="{'group_by': 'type'}"/>
+                    <filter string="Quốc gia" name="group_country" domain="[]" context="{'group_by': 'country_id'}"/>
+                    <filter string="Tháng" name="group_month" domain="[]" context="{'group_by': 'date:month'}"/>
+                    <filter string="Năm" name="group_year" domain="[]" context="{'group_by': 'date:year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="vietnam_attendance_holiday_action" model="ir.actions.act_window">
+        <field name="name">Ngày nghỉ lễ</field>
+        <field name="res_model">vietnam.attendance.holiday</field>
+        <field name="view_mode">list,form,calendar</field>
+        <field name="search_view_id" ref="vietnam_attendance_holiday_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo ngày nghỉ lễ đầu tiên
+            </p>
+            <p>
+                Bạn có thể thêm các ngày nghỉ lễ chính thức hoặc ngày nghỉ riêng của công ty.
+            </p>
+        </field>
+    </record>
+
+    <!-- Button tạo ngày nghỉ lễ cho năm tiếp theo -->
+    <record id="vietnam_attendance_holiday_generate_action" model="ir.actions.server">
+        <field name="name">Tạo ngày nghỉ lễ cho năm tiếp theo</field>
+        <field name="model_id" ref="model_vietnam_attendance_holiday"/>
+        <field name="binding_model_id" ref="model_vietnam_attendance_holiday"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = model.generate_holidays_for_next_year()
+        </field>
+    </record>
+
+    <!-- Button tạo ngày nghỉ lễ Việt Nam -->
+    <record id="vietnam_attendance_holiday_create_vietnam_action" model="ir.actions.server">
+        <field name="name">Tạo ngày nghỉ lễ Việt Nam</field>
+        <field name="model_id" ref="model_vietnam_attendance_holiday"/>
+        <field name="binding_model_id" ref="model_vietnam_attendance_holiday"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = model.create_public_holidays_for_vietnam()
+        </field>
+    </record>
+</odoo>
