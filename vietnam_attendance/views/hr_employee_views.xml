@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="vietnam_hr_employee_view_form" model="ir.ui.view">
+        <field name="name">vietnam.hr.employee.view.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_attendances" type="object" class="oe_stat_button" icon="fa-clock-o">
+                    <field name="attendances_count" widget="statinfo" string="Chấm công"/>
+                </button>
+                <button name="action_view_overtime" type="object" class="oe_stat_button" icon="fa-calendar-plus-o">
+                    <field name="overtime_count" widget="statinfo" string="Tăng ca"/>
+                </button>
+            </div>
+            <page name="hr_settings" position="after">
+                <page name="attendance" string="Chấm công">
+                    <group>
+                        <group string="Thiết lập chấm công">
+                            <field name="default_attendance_location_id"/>
+                            <field name="shift_ids" widget="many2many_tags"/>
+                            <field name="attendance_status"/>
+                            <field name="last_check_in"/>
+                            <field name="last_check_out"/>
+                            <field name="allow_check_in" invisible="1"/>
+                        </group>
+                        <group string="Thông tin sinh trắc học">
+                            <field name="face_image" widget="image" class="oe_avatar"/>
+                            <field name="fingerprint_data" readonly="1"/>
+                            <button name="register_face" string="Đăng ký khuôn mặt" type="object" class="oe_highlight"/>
+                        </group>
+                    </group>
+                    <group string="Thống kê chấm công">
+                        <group>
+                            <field name="late_count"/>
+                            <field name="early_leave_count"/>
+                            <field name="absent_count"/>
+                        </group>
+                        <group>
+                            <field name="worked_hours_month" widget="float_time"/>
+                            <field name="worked_hours_year" widget="float_time"/>
+                        </group>
+                    </group>
+                    <group string="Mã QR chấm công">
+                        <field name="qr_code" widget="image" class="oe_avatar"/>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="vietnam_hr_employee_view_kanban" model="ir.ui.view">
+        <field name="name">vietnam.hr.employee.view.kanban</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.hr_employee_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('o_kanban_record_bottom')]" position="inside">
+                <div class="oe_kanban_bottom_right">
+                    <field name="attendance_status" widget="label_selection" options="{'classes': {'checked_in': 'success', 'checked_out': 'danger', 'not_checked': 'default'}}"/>
+                </div>
+            </xpath>
+            <xpath expr="//ul[@class='oe_kanban_details']/li[last()]" position="after">
+                <li t-if="record.attendance_status.raw_value == 'checked_in'">
+                    Vào: <field name="last_check_in"/>
+                </li>
+                <li t-if="record.attendance_status.raw_value == 'checked_out'">
+                    Ra: <field name="last_check_out"/>
+                </li>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="vietnam_hr_employee_view_tree" model="ir.ui.view">
+        <field name="name">vietnam.hr.employee.view.tree</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree"/>
+        <field name="arch" type="xml">
+            <field name="job_id" position="after">
+                <field name="attendance_status"/>
+                <field name="last_check_in"/>
+                <field name="last_check_out"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="vietnam_hr_employee_view_search" model="ir.ui.view">
+        <field name="name">vietnam.hr.employee.view.search</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='group_department']" position="after">
+                <separator/>
+                <filter string="Đã chấm công vào" name="checked_in" domain="[('attendance_status', '=', 'checked_in')]"/>
+                <filter string="Đã chấm công ra" name="checked_out" domain="[('attendance_status', '=', 'checked_out')]"/>
+                <filter string="Chưa chấm công" name="not_checked" domain="[('attendance_status', '=', 'not_checked')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Check In/Out Actions -->
+    <record id="vietnam_attendance_action_check_in" model="ir.actions.server">
+        <field name="name">Chấm công vào</field>
+        <field name="model_id" ref="model_hr_employee"/>
+        <field name="binding_model_id" ref="model_hr_employee"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = records.action_check_in()
+        </field>
+    </record>
+
+    <record id="vietnam_attendance_action_check_out" model="ir.actions.server">
+        <field name="name">Chấm công ra</field>
+        <field name="model_id" ref="model_hr_employee"/>
+        <field name="binding_model_id" ref="model_hr_employee"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = records.action_check_out()
+        </field>
+    </record>
+</odoo>

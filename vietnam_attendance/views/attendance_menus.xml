@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="vietnam_attendance_menu_root"
+              name="Chấm công Việt Nam"
+              sequence="80"
+              web_icon="vietnam_attendance,static/description/icon.png"/>
+    
+    <!-- Dashboard Menu -->
+    <menuitem id="vietnam_attendance_menu_dashboard"
+              name="Bảng điều khiển"
+              parent="vietnam_attendance_menu_root"
+              action="vietnam_attendance_dashboard_action"
+              sequence="1"/>
+    
+    <!-- Attendance Menu -->
+    <menuitem id="vietnam_attendance_menu_main"
+              name="Chấm công"
+              parent="vietnam_attendance_menu_root"
+              sequence="10"/>
+    
+    <menuitem id="vietnam_attendance_menu_attendance"
+              name="Chấm công"
+              parent="vietnam_attendance_menu_main"
+              action="vietnam_attendance_action"
+              sequence="11"/>
+    
+    <menuitem id="vietnam_attendance_menu_attendance_report"
+              name="Báo cáo chấm công"
+              parent="vietnam_attendance_menu_main"
+              action="vietnam_attendance_report_action"
+              sequence="12"/>
+    
+    <menuitem id="vietnam_attendance_menu_overtime"
+              name="Tăng ca"
+              parent="vietnam_attendance_menu_main"
+              action="vietnam_attendance_overtime_action"
+              sequence="13"/>
+    
+    <!-- Configuration Menu -->
+    <menuitem id="vietnam_attendance_menu_config"
+              name="Cấu hình"
+              parent="vietnam_attendance_menu_root"
+              sequence="100"/>
+    
+    <menuitem id="vietnam_attendance_menu_shift"
+              name="Ca làm việc"
+              parent="vietnam_attendance_menu_config"
+              action="vietnam_attendance_shift_action"
+              sequence="101"/>
+    
+    <menuitem id="vietnam_attendance_menu_location"
+              name="Địa điểm chấm công"
+              parent="vietnam_attendance_menu_config"
+              action="vietnam_attendance_location_action"
+              sequence="102"/>
+    
+    <menuitem id="vietnam_attendance_menu_device"
+              name="Thiết bị chấm công"
+              parent="vietnam_attendance_menu_config"
+              action="vietnam_attendance_device_action"
+              sequence="103"/>
+    
+    <menuitem id="vietnam_attendance_menu_holiday"
+              name="Ngày nghỉ lễ"
+              parent="vietnam_attendance_menu_config"
+              action="vietnam_attendance_holiday_action"
+              sequence="104"/>
+    
+    <menuitem id="vietnam_attendance_menu_rule"
+              name="Quy định chấm công"
+              parent="vietnam_attendance_menu_config"
+              action="vietnam_attendance_rule_action"
+              sequence="105"/>
+    
+    <menuitem id="vietnam_attendance_menu_settings"
+              name="Thiết lập chấm công"
+              parent="vietnam_attendance_menu_config"
+              action="vietnam_attendance_config_action"
+              sequence="106"/>
+    
+    <!-- Add to HR Menu -->
+    <menuitem id="vietnam_attendance_menu_hr_attendance"
+              name="Chấm công Việt Nam"
+              parent="hr.menu_hr_root"
+              sequence="15"/>
+    
+    <menuitem id="vietnam_attendance_menu_hr_attendance_dashboard"
+              name="Bảng điều khiển"
+              parent="vietnam_attendance_menu_hr_attendance"
+              action="vietnam_attendance_dashboard_action"
+              sequence="1"/>
+    
+    <menuitem id="vietnam_attendance_menu_hr_attendance_list"
+              name="Chấm công"
+              parent="vietnam_attendance_menu_hr_attendance"
+              action="vietnam_attendance_action"
+              sequence="2"/>
+    
+    <menuitem id="vietnam_attendance_menu_hr_overtime"
+              name="Tăng ca"
+              parent="vietnam_attendance_menu_hr_attendance"
+              action="vietnam_attendance_overtime_action"
+              sequence="3"/>
+</odoo>
