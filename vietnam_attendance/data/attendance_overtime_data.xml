@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Thêm hoạt động Email cho tăng ca -->
+        <record id="mail_activity_data_overtime_approval" model="mail.activity.type">
+            <field name="name">Yêu cầu duyệt tăng ca</field>
+            <field name="icon">fa-clock-o</field>
+            <field name="res_model">vietnam.attendance.overtime</field>
+            <field name="default_next_type_id" ref="mail.mail_activity_data_todo"/>
+            <field name="category">default</field>
+            <field name="sequence">10</field>
+        </record>
+        
+        <!-- Mẫu Email thông báo tăng ca -->
+        <record id="email_template_overtime_request" model="mail.template">
+            <field name="name">Thông báo yêu cầu tăng ca</field>
+            <field name="model_id" ref="model_vietnam_attendance_overtime"/>
+            <field name="subject">Yêu cầu tăng ca: ${object.name}</field>
+            <field name="email_from">${user.email_formatted | safe}</field>
+            <field name="email_to">${object.manager_id.work_email}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Kính gửi <strong>${object.manager_id.name}</strong>,
+                        <br/>
+                        <br/>
+                        Nhân viên <strong>${object.employee_id.name}</strong> đã nộp yêu cầu tăng ca như sau:
+                        <br/><br/>
+                        <b>Ngày:</b> ${format_date(object.date)}
+                        <br/>
+                        <b>Thời gian:</b> ${"%02d:%02d" % (int(object.start_time), int((object.start_time - int(object.start_time)) * 60))} - ${"%02d:%02d" % (int(object.end_time), int((object.end_time - int(object.end_time)) * 60))}
+                        <br/>
+                        <b>Tổng thời gian:</b> ${"%0.2f" % object.duration} giờ
+                        <br/>
+                        <b>Loại tăng ca:</b> ${dict(object._fields['overtime_type'].selection).get(object.overtime_type)}
+                        <br/>
+                        <b>Lý do:</b> ${object.reason}
+                        <br/><br/>
+                        Vui lòng đăng nhập vào hệ thống để xem và duyệt yêu cầu tăng ca:
+                        <div style="margin: 16px 0px 16px 0px; text-align: center;">
+                            <a href="/web#id=${object.id}&amp;model=vietnam.attendance.overtime&amp;view_type=form"
+                                style="display: inline-block; padding: 10px; text-decoration: none; font-size: 12px; background-color: #875A7B; color: #FFFFFF; border-radius: 5px;">
+                                <strong>Xem chi tiết</strong>
+                            </a>
+                        </div>
+                        <br/>
+                        <p style="color: #888888;">
+                            <i>Đây là email tự động, vui lòng không trả lời email này.</i>
+                        </p>
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.employee_id.user_id.lang}</field>
+        </record>
+        
+        <!-- Mẫu Email thông báo tăng ca được duyệt -->
+        <record id="email_template_overtime_approved" model="mail.template">
+            <field name="name">Thông báo tăng ca được duyệt</field>
+            <field name="model_id" ref="model_vietnam_attendance_overtime"/>
+            <field name="subject">Tăng ca đã được duyệt: ${object.name}</field>
+            <field name="email_from">${user.email_formatted | safe}</field>
+            <field name="email_to">${object.employee_id.work_email}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Xin chào <strong>${object.employee_id.name}</strong>,
+                        <br/>
+                        <br/>
+                        Yêu cầu tăng ca của bạn đã được duyệt:
+                        <br/><br/>
+                        <b>Ngày:</b> ${format_date(object.date)}
+                        <br/>
+                        <b>Thời gian:</b> ${"%02d:%02d" % (int(object.start_time), int((object.start_time - int(object.start_time)) * 60))} - ${"%02d:%02d" % (int(object.end_time), int((object.end_time - int(object.end_time)) * 60))}
+                        <br/>
+                        <b>Tổng thời gian:</b> ${"%0.2f" % object.duration} giờ
+                        <br/>
+                        <b>Loại tăng ca:</b> ${dict(object._fields['overtime_type'].selection).get(object.overtime_type)}
+                        <br/>
+                        <b>Hệ số tăng ca:</b> ${"%0.2f" % object.rate}x
+                        <br/><br/>
+                        <div style="margin: 16px 0px 16px 0px; text-align: center;">
+                            <a href="/web#id=${object.id}&amp;model=vietnam.attendance.overtime&amp;view_type=form"
+                                style="display: inline-block; padding: 10px; text-decoration: none; font-size: 12px; background-color: #28a745; color: #FFFFFF; border-radius: 5px;">
+                                <strong>Xem chi tiết</strong>
+                            </a>
+                        </div>
+                        <br/>
+                        <p style="color: #888888;">
+                            <i>Đây là email tự động, vui lòng không trả lời email này.</i>
+                        </p>
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.employee_id.user_id.lang}</field>
+        </record>
+        
+        <!-- Mẫu Email thông báo tăng ca bị từ chối -->
+        <record id="email_template_overtime_rejected" model="mail.template">
+            <field name="name">Thông báo tăng ca bị từ chối</field>
+            <field name="model_id" ref="model_vietnam_attendance_overtime"/>
+            <field name="subject">Tăng ca bị từ chối: ${object.name}</field>
+            <field name="email_from">${user.email_formatted | safe}</field>
+            <field name="email_to">${object.employee_id.work_email}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Xin chào <strong>${object.employee_id.name}</strong>,
+                        <br/>
+                        <br/>
+                        Yêu cầu tăng ca của bạn đã bị từ chối:
+                        <br/><br/>
+                        <b>Ngày:</b> ${format_date(object.date)}
+                        <br/>
+                        <b>Thời gian:</b> ${"%02d:%02d" % (int(object.start_time), int((object.start_time - int(object.start_time)) * 60))} - ${"%02d:%02d" % (int(object.end_time), int((object.end_time - int(object.end_time)) * 60))}
+                        <br/>
+                        <b>Loại tăng ca:</b> ${dict(object._fields['overtime_type'].selection).get(object.overtime_type)}
+                        <br/><br/>
+                        Vui lòng liên hệ với quản lý của bạn để biết thêm chi tiết.
+                        <div style="margin: 16px 0px 16px 0px; text-align: center;">
+                            <a href="/web#id=${object.id}&amp;model=vietnam.attendance.overtime&amp;view_type=form"
+                                style="display: inline-block; padding: 10px; text-decoration: none; font-size: 12px; background-color: #dc3545; color: #FFFFFF; border-radius: 5px;">
+                                <strong>Xem chi tiết</strong>
+                            </a>
+                        </div>
+                        <br/>
+                        <p style="color: #888888;">
+                            <i>Đây là email tự động, vui lòng không trả lời email này.</i>
+                        </p>
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.employee_id.user_id.lang}</field>
+        </record>
+        
+        <!-- Hệ số tăng ca cho ngày thường -->
+        <record id="overtime_rate_normal" model="vietnam.attendance.rule">
+            <field name="name">Tăng ca ngày thường</field>
+            <field name="code">OT_NORMAL</field>
+            <field name="rule_type">overtime</field>
+            <field name="bonus_type">percentage</field>
+            <field name="bonus_value">150</field>
+            <field name="description">Tăng ca ngày thường được trả 150% lương theo giờ</field>
+            <field name="sequence">10</field>
+        </record>
+        
+        <!-- Hệ số tăng ca cho cuối tuần -->
+        <record id="overtime_rate_weekend" model="vietnam.attendance.rule">
+            <field name="name">Tăng ca cuối tuần</field>
+            <field name="code">OT_WEEKEND</field>
+            <field name="rule_type">weekend</field>
+            <field name="bonus_type">percentage</field>
+            <field name="bonus_value">200</field>
+            <field name="description">Tăng ca cuối tuần được trả 200% lương theo giờ</field>
+            <field name="sequence">20</field>
+        </record>
+        
+        <!-- Hệ số tăng ca cho ngày lễ -->
+        <record id="overtime_rate_holiday" model="vietnam.attendance.rule">
+            <field name="name">Tăng ca ngày lễ</field>
+            <field name="code">OT_HOLIDAY</field>
+            <field name="rule_type">holiday</field>
+            <field name="bonus_type">percentage</field>
+            <field name="bonus_value">300</field>
+            <field name="description">Tăng ca ngày lễ được trả 300% lương theo giờ</field>
+            <field name="sequence">30</field>
+        </record>
+        
+        <!-- Hệ số tăng ca cho ca đêm -->
+        <record id="overtime_rate_night" model="vietnam.attendance.rule">
+            <field name="name">Tăng ca ca đêm</field>
+            <field name="code">OT_NIGHT</field>
+            <field name="rule_type">night_shift</field>
+            <field name="bonus_type">percentage</field>
+            <field name="bonus_value">130</field>
+            <field name="description">Tăng ca ca đêm được trả thêm 30% so với tăng ca thông thường</field>
+            <field name="sequence">40</field>
+        </record>
+    </data>
+</odoo>
