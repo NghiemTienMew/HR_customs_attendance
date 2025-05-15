@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Template Dashboard -->
+    <t t-name="VietnamAttendanceDashboard">
+        <div class="o_vietnam_attendance_dashboard">
+            <div class="o_content"/>
+        </div>
+    </t>
+
+    <!-- Template Nội dung Dashboard -->
+    <t t-name="VietnamAttendanceDashboardContent">
+        <div class="o_title">Chấm công ngày <t t-esc="moment().format('DD/MM/YYYY')"/></div>
+        
+        <div class="o_employee_info">
+            <img class="o_employee_picture" t-att-src="widget.dashboardData.employee_image_url || '/vietnam_attendance/static/description/avatar_placeholder.png'" t-att-alt="widget.dashboardData.employee_name"/>
+            <div class="o_employee_details">
+                <div class="o_employee_name"><t t-esc="widget.dashboardData.employee_name"/></div>
+                <div class="o_employee_job"><t t-esc="widget.dashboardData.employee_job"/></div>
+                
+                <div class="o_attendance_status">
+                    <t t-if="widget.dashboardData.status === 'checked_in'">
+                        <span class="text-success">Đã chấm công vào</span>
+                    </t>
+                    <t t-elif="widget.dashboardData.status === 'checked_out'">
+                        <span class="text-danger">Đã chấm công ra</span>
+                    </t>
+                    <t t-else="">
+                        <span class="text-muted">Chưa chấm công</span>
+                    </t>
+                </div>
+                
+                <div class="o_attendance_time">
+                    <t t-if="widget.dashboardData.status === 'checked_in'">
+                        <span>Vào lúc: <t t-esc="widget.dashboardData.check_in_local"/></span>
+                    </t>
+                    <t t-elif="widget.dashboardData.status === 'checked_out'">
+                        <span>Từ <t t-esc="moment(widget.dashboardData.check_in).format('HH:mm')"/> đến <t t-esc="moment(widget.dashboardData.check_out).format('HH:mm')"/></span>
+                        <br/>
+                        <span>Thời gian làm việc: <t t-esc="widget.dashboardData.worked_hours"/> giờ</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+        
+        <div class="o_attendance_buttons">
+            <t t-if="widget.dashboardData.status !== 'checked_in'">
+                <div class="o_attendance_button o_check_in_button o_vietnam_attendance_check_in">
+                    <i class="fa fa-sign-in"></i>
+                    <span>Chấm công vào</span>
+                </div>
+            </t>
+            
+            <t t-if="widget.dashboardData.status === 'checked_in'">
+                <div class="o_attendance_button o_check_out_button o_vietnam_attendance_check_out">
+                    <i class="fa fa-sign-out"></i>
+                    <span>Chấm công ra</span>
+                </div>
+            </t>
+            
+            <div class="o_attendance_button o_overtime_button o_vietnam_attendance_overtime">
+                <i class="fa fa-clock-o"></i>
+                <span>Đăng ký tăng ca</span>
+            </div>
+            
+            <div class="o_attendance_button o_report_button o_vietnam_attendance_report">
+                <i class="fa fa-bar-chart"></i>
+                <span>Báo cáo chấm công</span>
+            </div>
+        </div>
+        
+        <div class="o_attendance_stats">
+            <div class="o_attendance_stat">
+                <div class="o_attendance_stat_value">
+                    <t t-esc="widget.dashboardData.total_worked_hours || 0"/>
+                </div>
+                <div class="o_attendance_stat_label">Tổng giờ làm việc tháng này</div>
+            </div>
+            
+            <div class="o_attendance_stat">
+                <div class="o_attendance_stat_value">
+                    <t t-esc="widget.dashboardData.late_count || 0"/>
+                </div>
+                <div class="o_attendance_stat_label">Số lần đi muộn</div>
+            </div>
+            
+            <div class="o_attendance_stat">
+                <div class="o_attendance_stat_value">
+                    <t t-esc="widget.dashboardData.early_leave_count || 0"/>
+                </div>
+                <div class="o_attendance_stat_label">Số lần về sớm</div>
+            </div>
+            
+            <div class="o_attendance_stat">
+                <div class="o_attendance_stat_value">
+                    <t t-esc="widget.dashboardData.overtime_hours || 0"/>
+                </div>
+                <div class="o_attendance_stat_label">Giờ tăng ca</div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Template QR Code -->
+    <t t-name="VietnamAttendanceQRCode">
+        <div class="o_vietnam_attendance_qrcode">
+            <div class="o_title">
+                <t t-if="widget.attendanceType === 'check_in'">
+                    Quét mã QR để chấm công vào
+                </t>
+                <t t-else="">
+                    Quét mã QR để chấm công ra
+                </t>
+            </div>
+            
+            <div class="o_video_container">
+                <video class="o_vietnam_attendance_qrcode_video" autoplay="true"></video>
+                <div class="o_vietnam_attendance_qrcode_overlay"></div>
+            </div>
+            
+            <button class="o_vietnam_attendance_qrcode_scan">
+                <i class="fa fa-qrcode"></i> Quét mã QR
+            </button>
+        </div>
+    </t>
+
+    <!-- Template Face Recognition -->
+    <t t-name="VietnamAttendanceFaceRecognition">
+        <div class="o_vietnam_attendance_face">
+            <div class="o_title">
+                <t t-if="widget.attendanceType === 'check_in'">
+                    Nhận diện khuôn mặt để chấm công vào
+                </t>
+                <t t-else="">
+                    Nhận diện khuôn mặt để chấm công ra
+                </t>
+            </div>
+            
+            <div class="o_video_container">
+                <video class="o_vietnam_attendance_face_video" autoplay="true"></video>
+                <div class="o_vietnam_attendance_face_overlay"></div>
+            </div>
+            
+            <button class="o_vietnam_attendance_face_capture">
+                <i class="fa fa-camera"></i> Chụp ảnh
+            </button>
+        </div>
+    </t>
+
+    <!-- Template GPS Location -->
+    <t t-name="VietnamAttendanceGPS">
+        <div class="o_vietnam_attendance_gps">
+            <div class="o_title">
+                <t t-if="widget.attendanceType === 'check_in'">
+                    Xác định vị trí GPS để chấm công vào
+                </t>
+                <t t-else="">
+                    Xác định vị trí GPS để chấm công ra
+                </t>
+            </div>
+            
+            <div class="o_map_container">
+                <div class="o_vietnam_attendance_map"></div>
+            </div>
+            
+            <div class="o_location_info">
+                <div class="o_location_accuracy">
+                    <i class="fa fa-map-marker"></i>
+                    <span>Độ chính xác: <t t-esc="widget.locationAccuracy"/> m</span>
+                </div>
+                
+                <div class="o_location_address">
+                    <i class="fa fa-location-arrow"></i>
+                    <span><t t-esc="widget.locationAddress"/></span>
+                </div>
+            </div>
+            
+            <button class="o_vietnam_attendance_gps_confirm">
+                <i class="fa fa-check"></i> Xác nhận vị trí
+            </button>
+        </div>
+    </t>
+
+    <!-- Template WiFi -->
+    <t t-name="VietnamAttendanceWiFi">
+        <div class="o_vietnam_attendance_wifi">
+            <div class="o_title">
+                <t t-if="widget.attendanceType === 'check_in'">
+                    Kiểm tra mạng WiFi để chấm công vào
+                </t>
+                <t t-else="">
+                    Kiểm tra mạng WiFi để chấm công ra
+                </t>
+            </div>
+            
+            <div class="o_wifi_info">
+                <div class="o_wifi_icon">
+                    <i class="fa fa-wifi"></i>
+                </div>
+                
+                <div class="o_wifi_details">
+                    <div class="o_wifi_name">
+                        <strong>Tên WiFi:</strong> <t t-esc="widget.wifiName"/>
+                    </div>
+                    
+                    <div class="o_wifi_mac">
+                        <strong>Địa chỉ MAC:</strong> <t t-esc="widget.wifiMAC"/>
+                    </div>
+                    
+                    <div class="o_wifi_status">
+                        <t t-if="widget.wifiMatched">
+                            <span class="text-success">
+                                <i class="fa fa-check-circle"></i> Mạng WiFi được phép chấm công
+                            </span>
+                        </t>
+                        <t t-else="">
+                            <span class="text-danger">
+                                <i class="fa fa-times-circle"></i> Mạng WiFi không được phép chấm công
+                            </span>
+                        </t>
+                    </div>
+                </div>
+            </div>
+            
+            <button t-att-disabled="!widget.wifiMatched" class="o_vietnam_attendance_wifi_confirm">
+                <i class="fa fa-check"></i> Xác nhận chấm công
+            </button>
+        </div>
+    </t>
+
+    <!-- Template Mobile Attendance Menu -->
+    <t t-name="VietnamAttendanceMobileMenu">
+        <div class="o_vietnam_attendance_mobile_menu">
+            <div class="o_title">Chọn phương thức chấm công</div>
+            
+            <div class="o_attendance_methods">
+                <div class="o_attendance_method" data-method="qrcode">
+                    <i class="fa fa-qrcode"></i>
+                    <span>QR Code</span>
+                </div>
+                
+                <div class="o_attendance_method" data-method="face">
+                    <i class="fa fa-user"></i>
+                    <span>Khuôn mặt</span>
+                </div>
+                
+                <div class="o_attendance_method" data-method="gps">
+                    <i class="fa fa-map-marker"></i>
+                    <span>GPS</span>
+                </div>
+                
+                <div class="o_attendance_method" data-method="wifi">
+                    <i class="fa fa-wifi"></i>
+                    <span>WiFi</span>
+                </div>
+                
+                <div class="o_attendance_method" data-method="manual">
+                    <i class="fa fa-hand-pointer-o"></i>
+                    <span>Thủ công</span>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
