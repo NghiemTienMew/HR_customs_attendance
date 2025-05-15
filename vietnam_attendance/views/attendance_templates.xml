@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- QR Code Generator Template -->
+    <template id="qrcode_template">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <h1>Mã QR chấm công</h1>
+                    <p>Quét mã QR này để chấm công</p>
+                    <div class="mt-4 mb-4">
+                        <img t-att-src="'/vietnam_attendance/qrcode?employee_id=%s' % employee.id" alt="QR Code" class="img-fluid"/>
+                    </div>
+                    <div class="mt-2">
+                        <strong><t t-esc="employee.name"/></strong>
+                        <br/>
+                        <small t-if="employee.job_id"><t t-esc="employee.job_id.name"/></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- Dashboard Template -->
+    <template id="attendance_dashboard_template">
+        <t t-call="web.html_container">
+            <t t-call="web.layout">
+                <t t-set="title">Bảng điều khiển chấm công</t>
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1 class="text-center">Bảng điều khiển chấm công</h1>
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4>Thông tin nhân viên</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <img t-att-src="image_data_uri(employee.image_128)" class="img-fluid rounded-circle" alt="Employee"/>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <h3><t t-esc="employee.name"/></h3>
+                                            <p t-if="employee.job_id"><strong>Chức vụ:</strong> <t t-esc="employee.job_id.name"/></p>
+                                            <p t-if="employee.department_id"><strong>Phòng ban:</strong> <t t-esc="employee.department_id.name"/></p>
+                                            <p>
+                                                <strong>Trạng thái chấm công:</strong>
+                                                <span t-if="employee.attendance_status == 'checked_in'" class="badge bg-success">Đã chấm công vào</span>
+                                                <span t-elif="employee.attendance_status == 'checked_out'" class="badge bg-danger">Đã chấm công ra</span>
+                                                <span t-else="" class="badge bg-secondary">Chưa chấm công</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h4>Thống kê chấm công tháng này</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    Tổng số giờ làm việc
+                                                    <span class="badge bg-primary rounded-pill"><t t-esc="'%.2f' % employee.worked_hours_month"/> giờ</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    Số lần đi muộn
+                                                    <span class="badge bg-warning rounded-pill"><t t-esc="employee.late_count"/></span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    Số lần về sớm
+                                                    <span class="badge bg-warning rounded-pill"><t t-esc="employee.early_leave_count"/></span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    Số lần vắng mặt
+                                                    <span class="badge bg-danger rounded-pill"><t t-esc="employee.absent_count"/></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h4>Chấm công</h4>
+                                        </div>
+                                        <div class="card-body text-center">
+                                            <t t-if="employee.attendance_status != 'checked_in'">
+                                                <a href="#" id="btn_check_in" class="btn btn-success btn-lg mb-3">
+                                                    <i class="fa fa-sign-in"></i> Chấm công vào
+                                                </a>
+                                            </t>
+                                            <t t-if="employee.attendance_status == 'checked_in'">
+                                                <a href="#" id="btn_check_out" class="btn btn-danger btn-lg mb-3">
+                                                    <i class="fa fa-sign-out"></i> Chấm công ra
+                                                </a>
+                                            </t>
+                                            <div class="mt-3">
+                                                <a href="#" id="btn_qrcode" class="btn btn-info">
+                                                    <i class="fa fa-qrcode"></i> Sử dụng mã QR
+                                                </a>
+                                                <a href="#" id="btn_face" class="btn btn-info ms-2">
+                                                    <i class="fa fa-user"></i> Sử dụng khuôn mặt
+                                                </a>
+                                                <a href="#" id="btn_overtime" class="btn btn-warning ms-2">
+                                                    <i class="fa fa-clock-o"></i> Đăng ký tăng ca
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4>Lịch sử chấm công gần đây</h4>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Ngày</th>
+                                                <th>Giờ vào</th>
+                                                <th>Giờ ra</th>
+                                                <th>Thời gian làm việc</th>
+                                                <th>Trạng thái</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="attendances" t-as="attendance">
+                                                <tr>
+                                                    <td><t t-esc="attendance.check_in.strftime('%d/%m/%Y')"/></td>
+                                                    <td><t t-esc="attendance.check_in.strftime('%H:%M:%S')"/></td>
+                                                    <td>
+                                                        <t t-if="attendance.check_out">
+                                                            <t t-esc="attendance.check_out.strftime('%H:%M:%S')"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="badge bg-info">Đang làm việc</span>
+                                                        </t>
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="attendance.worked_hours">
+                                                            <t t-esc="'%.2f' % attendance.worked_hours"/> giờ
+                                                        </t>
+                                                        <t t-else="">
+                                                            -
+                                                        </t>
+                                                    </td>
+                                                    <td>
+                                                        <span t-if="attendance.is_late" class="badge bg-warning">Đi muộn</span>
+                                                        <span t-if="attendance.is_early_leave" class="badge bg-warning">Về sớm</span>
+                                                        <span t-if="attendance.attendance_type == 'overtime'" class="badge bg-info">Tăng ca</span>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Mobile QR Code Template -->
+    <template id="mobile_qrcode_template">
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="text-center">Chấm công bằng QR code</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <div id="reader" style="width: 100%; max-width: 500px; margin: 0 auto;"></div>
+                            </div>
+                            <div class="text-center" id="qrcode-result">
+                                <div class="alert alert-info">
+                                    Hãy đưa mã QR vào khung hình để chấm công
+                                </div>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button id="start-scan" class="btn btn-primary">
+                                    <i class="fa fa-camera"></i> Bắt đầu quét
+                                </button>
+                                <button id="stop-scan" class="btn btn-secondary ms-2" style="display: none;">
+                                    <i class="fa fa-stop"></i> Dừng quét
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Mobile Face Recognition Template -->
+    <template id="mobile_face_template">
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="text-center">Chấm công bằng khuôn mặt</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <video id="video" width="100%" style="max-width: 500px; margin: 0 auto;"></video>
+                                <canvas id="canvas" style="display: none;"></canvas>
+                            </div>
+                            <div class="text-center" id="face-result">
+                                <div class="alert alert-info">
+                                    Hãy đưa khuôn mặt vào khung hình để chấm công
+                                </div>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button id="start-camera" class="btn btn-primary">
+                                    <i class="fa fa-camera"></i> Bắt đầu camera
+                                </button>
+                                <button id="capture" class="btn btn-success ms-2" style="display: none;">
+                                    <i class="fa fa-camera"></i> Chụp ảnh
+                                </button>
+                                <button id="stop-camera" class="btn btn-secondary ms-2" style="display: none;">
+                                    <i class="fa fa-stop"></i> Dừng camera
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</odoo>
